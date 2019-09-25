@@ -1,5 +1,6 @@
 package dao;
 
+import models.Foodtype;
 import models.Restaurant;
 import java.util.List;
 
