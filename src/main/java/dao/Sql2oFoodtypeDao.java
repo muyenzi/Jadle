@@ -12,7 +12,9 @@ import java.util.List;
 
 public class Sql2oFoodtypeDao implements FoodtypeDao {
     private final Sql2o sql2o;
-    public Sql2oFoodtypeDao(Sql2o sql2o) { this.sql2o = sql2o; }
+
+    public Sql2oFoodtypeDao(Sql2o sql2o)
+    { this.sql2o = sql2o; }
 
     @Override
     public void add(Foodtype foodtype) {
@@ -36,8 +38,9 @@ public class Sql2oFoodtypeDao implements FoodtypeDao {
                     .addParameter("restaurantId", restaurant.getId())
                     .addParameter("foodtypeId", foodtype.getId())
                     .executeUpdate();
-        } catch (Sql2oException ex){
-            System.out.println(ex);
+        } catch (Sql2oException raisa){
+            System.out.println(raisa);
+            raisa.getMessage();
         }
     }
 
@@ -75,12 +78,17 @@ public class Sql2oFoodtypeDao implements FoodtypeDao {
 
     @Override
     public void deleteById(int id) {
-        String sql = "DELETE from foodtypes WHERE id=:id";
+        String sql = "DELETE from foodtypes WHERE id = :id";
+        String deleteJoin = "DELETE from restaurants_foodtypes WHERE foodtypeid = :foodtypeid";
         try (Connection con = sql2o.open()) {
             con.createQuery(sql)
                     .addParameter("id", id)
                     .executeUpdate();
-        } catch (Sql2oException ex) {
+            con.createQuery(deleteJoin)
+                    .addParameter("foodtypeid", id)
+                    .executeUpdate();
+
+        } catch (Sql2oException ex){
             System.out.println(ex);
         }
     }
