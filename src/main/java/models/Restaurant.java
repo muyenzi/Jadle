@@ -12,7 +12,6 @@ public class Restaurant {
     private String email;
     private int id;
 
-
     public Restaurant(String name, String address, String zipcode, String phone) {
         this.name = name;
         this.address = address;
@@ -90,7 +89,7 @@ public class Restaurant {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Restaurant)) return false;
         Restaurant that = (Restaurant) o;
         return id == that.id &&
                 Objects.equals(name, that.name) &&

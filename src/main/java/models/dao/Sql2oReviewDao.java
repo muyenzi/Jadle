@@ -1,9 +1,9 @@
-package dao;
-
+package models.dao;
 import models.Review;
 import org.sql2o.Connection;
 import org.sql2o.Sql2o;
 import org.sql2o.Sql2oException;
+
 import java.util.List;
 
 public class Sql2oReviewDao implements ReviewDao {
@@ -12,7 +12,7 @@ public class Sql2oReviewDao implements ReviewDao {
 
     @Override
     public void add(Review review) {
-        String sql = "INSERT INTO reviews (writtenby, content, rating, restaurantid) VALUES (:writtenBy, :content, :rating, :restaurantId)"; //if you change your model, be sure to update here as well!
+        String sql = "INSERT INTO reviews (writtenby, content, rating, restaurantid,createdat) VALUES (:writtenBy, :content, :rating, :restaurantId,:createdat)"; //if you change your model, be sure to update here as well!
         try (Connection con = sql2o.open()) {
             int id = (int) con.createQuery(sql, true)
                     .bind(review)
@@ -61,5 +61,13 @@ public class Sql2oReviewDao implements ReviewDao {
         } catch (Sql2oException ex) {
             System.out.println(ex);
         }
+    }
+
+    @Override
+    public List<Review> getAllReviewsByRestaurantSortedNewestToOldest(int restaurantId) {
+        List<Review> unsortedReviews = getAllReviewsByRestaurant(restaurantId); //calling other method!
+        List<Review> sortedReviews = unsortedReviews;
+
+        return sortedReviews;
     }
 }

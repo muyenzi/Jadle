@@ -1,4 +1,4 @@
-package dao;
+package models.dao;
 
 import models.Foodtype;
 import models.Restaurant;
@@ -13,9 +13,10 @@ public interface FoodtypeDao {
 
     //read
     List<Foodtype> getAll();
-     List<Restaurant> getAllRestaurantsForAFoodtype(int id);
+    List<Restaurant> getAllRestaurantsForAFoodtype(int id);
 
     //update
+
     //omit for now
 
     //delete

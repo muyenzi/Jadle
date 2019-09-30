@@ -1,4 +1,4 @@
-package dao;
+package models.dao;
 
 import models.Foodtype;
 import models.Restaurant;
@@ -9,17 +9,14 @@ import org.sql2o.Sql2oException;
 import java.util.ArrayList;
 import java.util.List;
 
-
-public class Sql2oFoodtypeDao implements FoodtypeDao {
+public class Sql2oFoodtypeDao implements FoodtypeDao { //don't forget to shake hands with your interface!
     private final Sql2o sql2o;
-
-    public Sql2oFoodtypeDao(Sql2o sql2o)
-    { this.sql2o = sql2o; }
-
+    public Sql2oFoodtypeDao(Sql2o sql2o){ this.sql2o = sql2o; }
+    int id;
     @Override
     public void add(Foodtype foodtype) {
-        String sql = "INSERT  FROM foodtypes (name) VALUES (:name)";
-        try (Connection con = sql2o.open()) {
+        String sql = "INSERT INTO foodtypes (name) VALUES (:name)";
+        try(Connection con = sql2o.open()){
             int id = (int) con.createQuery(sql, true)
                     .bind(foodtype)
                     .executeUpdate()
@@ -30,32 +27,65 @@ public class Sql2oFoodtypeDao implements FoodtypeDao {
         }
     }
 
+//    @Override
+//    public void addFoodtypeToRestaurant(Foodtype foodtype, Restaurant restaurant) {
+//
+//    }
+
     @Override
-    public void addFoodtypeToRestaurant(Foodtype foodtype, Restaurant restaurant) {
+    public List<Foodtype> getAll() {
+        try(Connection con = sql2o.open()){
+            return con.createQuery("SELECT * FROM foodtypes")
+                    .executeAndFetch(Foodtype.class);
+        }
+    }
+
+
+//    @Override
+//    public List<Restaurant> getAllRestaurantsForAFoodtype(int id) {
+//        List<Restaurant> restaurants = new ArrayList();
+//        return restaurants;
+//    }
+
+    @Override
+    public void deleteById(int id) {
+        String sql = "DELETE from foodtypes WHERE id=:id"; //raw sql
+        try (Connection con = sql2o.open()) {
+            con.createQuery(sql)
+                    .addParameter("id", id)
+                    .executeUpdate();
+        } catch (Sql2oException ex){
+            System.out.println(ex);
+        }
+    }
+
+    @Override
+    public void clearAll() {
+        String sql = "DELETE from foodtypes";
+        try (Connection con = sql2o.open()) {
+            con.createQuery(sql).executeUpdate();
+        } catch (Sql2oException ex) {
+            System.out.println(ex);
+        }
+    }
+    @Override
+    public void addFoodtypeToRestaurant(Foodtype foodtype, Restaurant restaurant){
         String sql = "INSERT INTO restaurants_foodtypes (restaurantid, foodtypeid) VALUES (:restaurantId, :foodtypeId)";
         try (Connection con = sql2o.open()) {
             con.createQuery(sql)
                     .addParameter("restaurantId", restaurant.getId())
                     .addParameter("foodtypeId", foodtype.getId())
                     .executeUpdate();
-        } catch (Sql2oException raisa){
-            System.out.println(raisa);
-            raisa.getMessage();
-        }
-    }
-
-
-    @Override
-    public List<Foodtype> getAll() {
-        try (Connection con = sql2o.open()) {
-            return con.createQuery("SELECT * FROM foodtypes")
-                    .executeAndFetch(Foodtype.class);
+        } catch (Sql2oException ex){
+            System.out.println(ex);
         }
     }
 
     @Override
     public List<Restaurant> getAllRestaurantsForAFoodtype(int foodtypeId) {
-        List<Restaurant> restaurants = new ArrayList();
+
+        ArrayList<Restaurant> restaurants = new ArrayList<>();
+
         String joinQuery = "SELECT restaurantid FROM restaurants_foodtypes WHERE foodtypeid = :foodtypeId";
 
         try (Connection con = sql2o.open()) {
@@ -75,31 +105,17 @@ public class Sql2oFoodtypeDao implements FoodtypeDao {
         return restaurants;
     }
 
-
-    @Override
-    public void deleteById(int id) {
-        String sql = "DELETE from foodtypes WHERE id = :id";
-        String deleteJoin = "DELETE from restaurants_foodtypes WHERE foodtypeid = :foodtypeid";
+    public Foodtype findById(int foodtypeId) {
+        String sql = "SELECT from foodtypes WHERE id=:id"; //raw sql
         try (Connection con = sql2o.open()) {
+
             con.createQuery(sql)
                     .addParameter("id", id)
                     .executeUpdate();
-            con.createQuery(deleteJoin)
-                    .addParameter("foodtypeid", id)
-                    .executeUpdate();
-
         } catch (Sql2oException ex){
             System.out.println(ex);
         }
-    }
 
-    @Override
-    public void clearAll() {
-        String sql = "DELETE from foodtypes";
-        try (Connection con = sql2o.open()) {
-            con.createQuery(sql).executeUpdate();
-        } catch (Sql2oException ex) {
-            System.out.println(ex);
-        }
+        return null;
     }
 }
